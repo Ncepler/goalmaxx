@@ -8,6 +8,7 @@ import { HydrationCounters } from '@/components/main/HydrationCounters'
 import { SleepButton } from '@/components/main/SleepButton'
 import { TomorrowPlan } from '@/components/main/TomorrowPlan'
 import { FocusToggle } from '@/components/main/FocusToggle'
+import { OverseerWidget } from '@/components/main/OverseerWidget'
 import { computeDailyScore } from '@/lib/score'
 
 export const revalidate = 0
@@ -101,8 +102,21 @@ export default async function MainPage() {
     tomorrowPlanFilled,
   })
 
+  const todayContext = {
+    date: today,
+    score,
+    tasks: { completed: completedCount, total: tasks.length },
+    waterMl: totalMl,
+    waterTargetMl: p.water_target_ml,
+    sleepHours: Math.round(lastNightSleepHours * 10) / 10,
+    workoutDone: (workoutSessions ?? []).length > 0,
+    focusMinutes,
+    tomorrowPlanFilled,
+  }
+
   return (
     <AppShell>
+      <OverseerWidget todayContext={todayContext} />
       <DailyHeader
         date={today}
         score={score}
