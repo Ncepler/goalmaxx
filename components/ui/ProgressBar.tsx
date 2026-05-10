@@ -13,10 +13,13 @@ export function ProgressBar({ value, color = 'gold', className = '' }: ProgressB
   }
 
   return (
-    <div className={`h-1 w-full rounded-full bg-bg-input overflow-hidden ${className}`}>
+    <div className={`h-1.5 w-full rounded-full bg-bg-input overflow-hidden ${className}`}>
       <div
-        className={`h-full rounded-full transition-all duration-300 ${fillColors[color]}`}
-        style={{ width: `${Math.min(100, Math.max(0, value * 100))}%` }}
+        className={`h-full rounded-full ${fillColors[color]}`}
+        style={{
+          width: `${Math.min(100, Math.max(0, value * 100))}%`,
+          transition: 'width 400ms var(--ease-out)',
+        }}
       />
     </div>
   )

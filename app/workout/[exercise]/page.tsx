@@ -66,7 +66,7 @@ export default async function ExerciseDetailPage({ params }: { params: Promise<{
 
         {/* Stats row */}
         <SectionHeader title="STATS" />
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-3 stagger-list">
           <StatCard label="EST. 1RM" value={best1RM > 0 ? `${best1RM}kg` : '—'} />
           <StatCard label="BEST SET" value={bestSet ? `${bestSet.weight_kg}×${bestSet.reps}` : '—'} />
           <StatCard label="REP RANGE" value={`${exercise.rep_range_low}–${exercise.rep_range_high}`} />
@@ -85,7 +85,7 @@ export default async function ExerciseDetailPage({ params }: { params: Promise<{
         {sessionDates.length === 0 ? (
           <p className="text-text-tertiary text-sm">No sessions logged yet.</p>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 stagger-list">
             {sessionDates.map(date => {
               const sessionSets = sessionMap.get(date)!
               const best = Math.max(...sessionSets.map(s => epley1RM(s.weight_kg, s.reps)))

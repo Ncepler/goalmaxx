@@ -23,7 +23,7 @@ export function AddExerciseForm() {
   return (
     <div>
       <SectionHeader title="ADD EXERCISE" />
-      <form action={createExercise} onSubmit={() => setOpen(false)} className="rounded-xl bg-bg-elevated border border-border-subtle p-5 space-y-3">
+      <form action={createExercise} onSubmit={() => setOpen(false)} className="rounded-xl bg-bg-elevated border border-border-subtle p-5 space-y-3 animate-in">
         <input name="name" placeholder="Exercise name" required className="w-full rounded-lg bg-bg-input border border-border-subtle px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border-strong" />
         <div className="flex gap-2">
           <input name="muscle_group" placeholder="Muscle group" className="flex-1 rounded-lg bg-bg-input border border-border-subtle px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border-strong" />

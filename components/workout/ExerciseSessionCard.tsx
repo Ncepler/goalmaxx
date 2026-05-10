@@ -21,7 +21,7 @@ export function ExerciseSessionCard({ exercise, lastSet, todaysSets, sessionId: 
   const [weight, setWeight] = useState(lastSet?.weight_kg?.toString() ?? '20')
   const [reps, setReps] = useState(exercise.rep_range_low?.toString() ?? '6')
   const [sessionId, setSessionId] = useState(initialSessionId)
-  const [, startTransition] = useTransition()
+  const [isPending, startTransition] = useTransition()
 
   const repLow = exercise.rep_range_low ?? 6
   const repHigh = exercise.rep_range_high ?? 8
@@ -128,9 +128,10 @@ export function ExerciseSessionCard({ exercise, lastSet, todaysSets, sessionId: 
         <div className="pt-5">
           <button
             onClick={handleLogSet}
-            className="px-4 py-2 rounded-lg bg-bg-hover border border-border-strong text-gold text-sm font-medium"
+            disabled={isPending}
+            className="px-4 py-2 rounded-lg bg-bg-hover border border-border-strong text-gold text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
           >
-            Log
+            {isPending ? '…' : 'Log'}
           </button>
         </div>
       </div>

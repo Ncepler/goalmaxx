@@ -17,6 +17,10 @@
   --warning: #c97a3a;
   --danger: #a04545;
   --info: #5a7a8e;
+
+  /* Easing curves — strong ease-out for UI interactions */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
 
 @theme inline {
@@ -40,7 +44,7 @@
 }
 
 * {
-  transition-timing-function: ease-out;
+  transition-timing-function: var(--ease-out);
   transition-duration: 150ms;
 }
 
@@ -68,4 +72,66 @@ body {
   background: var(--border-subtle);
   margin-right: 8px;
   vertical-align: middle;
+}
+
+/* ── Interaction base ─────────────────────────────────── */
+
+/* Reduce tap delay on mobile */
+button, a, [role="button"] {
+  touch-action: manipulation;
+}
+
+/* Press feedback: scale(0.97) on active, 120ms so it feels instant */
+button:active:not(:disabled),
+[role="button"]:active {
+  transform: scale(0.97);
+  transition-duration: 120ms;
+}
+
+/* Hover brightness lift — pointer devices only */
+@media (hover: hover) and (pointer: fine) {
+  button:not(:disabled):hover {
+    opacity: 0.92;
+  }
+}
+
+/* ── Entry animations ─────────────────────────────────── */
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Single element entry */
+.animate-in {
+  animation: fade-up 300ms var(--ease-out) both;
+}
+
+/* ── Stagger for lists ────────────────────────────────── */
+
+/* Wrap a list in .stagger-list — children animate in sequence */
+.stagger-list > * {
+  animation: fade-up 280ms var(--ease-out) both;
+}
+.stagger-list > *:nth-child(1)   { animation-delay: 0ms;   }
+.stagger-list > *:nth-child(2)   { animation-delay: 45ms;  }
+.stagger-list > *:nth-child(3)   { animation-delay: 90ms;  }
+.stagger-list > *:nth-child(4)   { animation-delay: 135ms; }
+.stagger-list > *:nth-child(5)   { animation-delay: 180ms; }
+.stagger-list > *:nth-child(6)   { animation-delay: 225ms; }
+.stagger-list > *:nth-child(n+7) { animation-delay: 270ms; }
+
+/* ── Reduced motion ───────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

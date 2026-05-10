@@ -56,7 +56,7 @@ export default async function WorkoutPage() {
         {(exercises ?? []).length === 0 ? (
           <p className="text-text-tertiary text-sm">No exercises yet. Add one below.</p>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 stagger-list">
             {(exercises ?? []).map((exercise: Exercise) => (
               <ExerciseSessionCard
                 key={exercise.id}

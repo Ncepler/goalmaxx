@@ -71,7 +71,7 @@ export default async function SchoolPage() {
     <AppShell>
       <div className="px-5 pt-6 pb-10 max-w-2xl">
         <SectionHeader title="CLASSES" />
-        <div className="grid grid-cols-1 gap-2 mb-10">
+        <div className="grid grid-cols-1 gap-2 mb-10 stagger-list">
           {classes.map((s: SchoolSubject) => (
             <SubjectCard
               key={s.id}
@@ -84,7 +84,7 @@ export default async function SchoolPage() {
         </div>
 
         <SectionHeader title="CLUBS" />
-        <div className="grid grid-cols-1 gap-2">
+        <div className="grid grid-cols-1 gap-2 stagger-list">
           {clubs.map((s: SchoolSubject) => (
             <SubjectCard
               key={s.id}

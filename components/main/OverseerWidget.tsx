@@ -58,7 +58,7 @@ export function OverseerWidget({ todayContext }: { todayContext: object }) {
       )}
 
       {response && (
-        <div className="mt-2 px-3 py-2 rounded-lg bg-bg-elevated border border-border-subtle">
+        <div className="mt-2 px-3 py-2 rounded-lg bg-bg-elevated border border-border-subtle animate-in">
           <p className="text-text-secondary text-sm leading-relaxed">{response}</p>
         </div>
       )}

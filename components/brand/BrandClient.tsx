@@ -76,6 +76,7 @@ export function BrandClient({ accounts, snapshots }: { accounts: Account[]; snap
         <p className="text-text-tertiary text-sm">No accounts tracked yet. Add one above.</p>
       )}
 
+      <div className="space-y-8 stagger-list">
       {accounts.map(account => {
         const acctSnaps = snapshots
           .filter(s => s.account_id === account.id)
@@ -167,6 +168,7 @@ export function BrandClient({ accounts, snapshots }: { accounts: Account[]; snap
           </div>
         )
       })}
+      </div>
     </div>
   )
 }

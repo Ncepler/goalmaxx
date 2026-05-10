@@ -32,7 +32,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg-base px-6">
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-sm animate-in">
         {/* Logo / wordmark */}
         <div className="mb-10 text-center">
           <h1 className="text-2xl font-bold tracking-widest text-gold uppercase">
@@ -45,8 +45,12 @@ export default function LoginPage() {
 
         <div className="rounded-xl bg-bg-elevated border border-border-subtle p-8">
           {sent ? (
-            <div className="text-center space-y-3">
-              <div className="text-3xl">✓</div>
+            <div className="text-center space-y-3 animate-in">
+              <div className="mx-auto w-10 h-10 rounded-full bg-success/20 flex items-center justify-center">
+                <svg className="w-5 h-5 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
               <p className="text-text-primary font-medium">Check your email</p>
               <p className="text-sm text-text-secondary">
                 Magic link sent to{' '}
@@ -77,9 +81,9 @@ export default function LoginPage() {
               <button
                 onClick={sendMagicLink}
                 disabled={loading}
-                className="w-full rounded-lg bg-bg-hover border border-border-strong py-3 text-sm font-medium text-gold tracking-wide disabled:opacity-40 hover:border-gold-dim transition-colors"
+                className="w-full rounded-lg bg-gold/10 border border-gold/30 hover:bg-gold/15 hover:border-gold/50 py-3 text-sm font-semibold text-gold tracking-wide disabled:opacity-40 transition-colors"
               >
-                {loading ? 'Sending…' : 'Send magic link'}
+                {loading ? 'Sending…' : 'Send magic link →'}
               </button>
             </div>
           )}

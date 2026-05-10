@@ -24,7 +24,7 @@ export function BottomNav() {
   const pathname = usePathname()
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-50 bg-bg-base border-t border-border-subtle lg:hidden">
+    <nav className="fixed bottom-0 inset-x-0 z-50 bg-bg-base/95 backdrop-blur-sm border-t border-border-subtle lg:hidden">
       <div className="flex">
         {primaryNav.map(({ href, label, icon: Icon }) => {
           const active = pathname === href || (href !== '/main' && pathname.startsWith(href) && href !== '/')
@@ -32,15 +32,17 @@ export function BottomNav() {
             <Link
               key={href}
               href={href}
-              className="flex-1 flex flex-col items-center gap-1 py-3 text-text-tertiary hover:text-text-secondary transition-colors group"
+              className={`flex-1 flex flex-col items-center gap-1 py-3 transition-colors active:scale-95 active:opacity-70 ${
+                active ? 'text-gold' : 'text-text-tertiary'
+              }`}
             >
-              <Icon size={20} className={active ? 'text-gold' : ''} />
-              <span className="text-[10px] tracking-wide uppercase" style={{ color: active ? 'var(--gold)' : undefined }}>
+              {active && (
+                <span className="absolute top-0 w-6 h-[2px] rounded-full bg-gold" />
+              )}
+              <Icon size={20} strokeWidth={active ? 2 : 1.5} />
+              <span className="text-[10px] tracking-wide uppercase font-medium">
                 {label}
               </span>
-              {active && (
-                <span className="absolute bottom-0 block h-[1px] w-6 bg-gold" />
-              )}
             </Link>
           )
         })}

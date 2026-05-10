@@ -19,7 +19,7 @@ export function DailyHeader({
   const dateLabel = format(new Date(date + 'T12:00:00'), 'EEE, MMM d').toUpperCase()
 
   return (
-    <div className="px-5 pt-6 pb-4 border-b border-border-subtle">
+    <div className="px-5 pt-6 pb-4 border-b border-border-subtle animate-in">
       <div className="flex items-start justify-between mb-4">
         <div>
           <p className="text-[11px] tracking-[0.15em] text-text-secondary uppercase mb-1">

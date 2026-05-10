@@ -58,7 +58,7 @@ export function TaskList({ tasks, date, label = 'GOALMAXXING' }: TaskListProps) 
       </div>
 
       {/* Task rows */}
-      <div className="space-y-1">
+      <div className="space-y-1 stagger-list">
         {[...incomplete, ...completed].map(task => (
           <TaskRow
             key={task.id}
@@ -76,7 +76,7 @@ export function TaskList({ tasks, date, label = 'GOALMAXXING' }: TaskListProps) 
         <form
           action={createTask}
           onSubmit={() => setShowAdd(false)}
-          className="mt-3"
+          className="mt-3 animate-in"
         >
           <input type="hidden" name="due_date" value={date} />
           <div className="flex gap-2">
