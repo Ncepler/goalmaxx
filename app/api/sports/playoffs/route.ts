@@ -3,8 +3,6 @@ import { NextResponse } from 'next/server'
 const LEAGUES = [
   { league: 'nhl', sport: 'hockey' },
   { league: 'nba', sport: 'basketball' },
-  { league: 'mlb', sport: 'baseball' },
-  { league: 'nfl', sport: 'football' },
 ]
 
 export async function GET() {
@@ -12,8 +10,8 @@ export async function GET() {
     const results = await Promise.allSettled(
       LEAGUES.map(async ({ league, sport }) => {
         const res = await fetch(
-          `https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/scoreboard`,
-          { next: { revalidate: 300 } }
+          `https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/scoreboard?seasontype=3`,
+          { next: { revalidate: 120 } }
         )
         if (!res.ok) return { league, events: [] }
         const data = await res.json()

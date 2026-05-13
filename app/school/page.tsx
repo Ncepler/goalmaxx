@@ -1,6 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/server'
 import { USER_ID } from '@/lib/config'
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { AppShell } from '@/components/nav/AppShell'
@@ -11,12 +10,17 @@ import type { SchoolSubject } from '@/lib/types'
 export const revalidate = 0
 
 const DEFAULT_SUBJECTS = [
-  { slug: 'english', name: 'English', kind: 'class', period: '1st period', teacher: '', sort_order: 0 },
-  { slug: 'global-history', name: 'Honors Global History', kind: 'class', period: '2nd period', teacher: '', sort_order: 1 },
-  { slug: 'spanish-3h', name: 'Spanish 3H', kind: 'class', period: '4th period', teacher: '', sort_order: 2 },
-  { slug: 'math', name: 'Math', kind: 'class', period: '5th period', teacher: '', sort_order: 3 },
-  { slug: 'science', name: 'Science', kind: 'class', period: '6th period', teacher: '', sort_order: 4 },
-  { slug: 'deca', name: 'DECA', kind: 'club', period: 'Tuesdays & Thursdays', teacher: '', sort_order: 5 },
+  { slug: 'chem-honors',    name: 'Chem Honors',           kind: 'class', period: '1st period', teacher: '', sort_order: 0 },
+  { slug: 'gym',            name: 'Gym',                   kind: 'class', period: '2nd period', teacher: '', sort_order: 1 },
+  { slug: 'incubator',      name: 'INCubator',             kind: 'class', period: '3rd period', teacher: '', sort_order: 2 },
+  { slug: 'english',        name: 'English Honors',        kind: 'class', period: '4th period', teacher: '', sort_order: 3 },
+  { slug: 'spanish',        name: 'Spanish Honors',        kind: 'class', period: '5th period', teacher: '', sort_order: 4 },
+  { slug: 'math',           name: 'Math Honors',           kind: 'class', period: '6th period', teacher: '', sort_order: 5 },
+  { slug: 'social-studies', name: 'Social Studies Honors', kind: 'class', period: '7th period', teacher: '', sort_order: 6 },
+  { slug: 'comp-sci',       name: 'AP Comp Sci',           kind: 'class', period: '8th period', teacher: '', sort_order: 7 },
+  { slug: 'deca',           name: 'DECA',                  kind: 'club',  period: 'Wednesdays',  teacher: '', sort_order: 8 },
+  { slug: 'sports-analytics', name: 'Sports Analytics',   kind: 'club',  period: 'Thursdays',   teacher: '', sort_order: 9 },
+  { slug: 'jsu',            name: 'JSU',                   kind: 'club',  period: 'Thursdays',   teacher: '', sort_order: 10 },
 ]
 
 export default async function SchoolPage() {

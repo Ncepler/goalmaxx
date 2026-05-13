@@ -1,38 +1,22 @@
 import { createAdminClient } from '@/lib/supabase/server'
 import { USER_ID } from '@/lib/config'
-import { redirect } from 'next/navigation'
 import { AppShell } from '@/components/nav/AppShell'
-import { FinancesClient } from '@/components/finances/FinancesClient'
-import { format, startOfMonth, endOfMonth } from 'date-fns'
+import { WebClientsClient } from '@/components/finances/WebClientsClient'
 
 export const revalidate = 0
 
 export default async function FinancesPage() {
   const supabase = createAdminClient()
 
-  const monthStart = format(startOfMonth(new Date()), 'yyyy-MM-dd')
-  const monthEnd = format(endOfMonth(new Date()), 'yyyy-MM-dd')
-
-  const [{ data: subs }, { data: orders }, { data: usage }] = await Promise.all([
-    supabase.from('subscriptions').select('*').eq('user_id', USER_ID).order('next_charge_date'),
-    supabase.from('incoming_orders').select('*').eq('user_id', USER_ID).order('expected_date'),
-    supabase
-      .from('usage_costs')
-      .select('cost_usd, input_tokens, output_tokens, feature, created_at')
-      .eq('user_id', USER_ID)
-      .gte('created_at', monthStart + 'T00:00:00')
-      .order('created_at', { ascending: false }),
-  ])
+  const { data: clients } = await supabase
+    .from('web_clients')
+    .select('*')
+    .eq('user_id', USER_ID)
+    .order('created_at', { ascending: false })
 
   return (
     <AppShell>
-      <FinancesClient
-        subscriptions={subs ?? []}
-        orders={orders ?? []}
-        usageCosts={usage ?? []}
-        monthStart={monthStart}
-        monthEnd={monthEnd}
-      />
+      <WebClientsClient clients={clients ?? []} />
     </AppShell>
   )
 }

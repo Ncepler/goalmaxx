@@ -1,6 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/server'
 import { USER_ID } from '@/lib/config'
-import { redirect } from 'next/navigation'
 import { format } from 'date-fns'
 import { AppShell } from '@/components/nav/AppShell'
 import { SectionHeader } from '@/components/ui/SectionHeader'

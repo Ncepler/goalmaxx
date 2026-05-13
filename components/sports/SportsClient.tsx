@@ -178,7 +178,7 @@ export function SportsClient({ teams, myGames: initialGames }: { teams: Team[]; 
           {playoffsLoading && <p className="text-text-tertiary text-sm">Loading games…</p>}
 
           {!playoffsLoading && filteredPlayoffs.length === 0 && (
-            <p className="text-text-tertiary text-sm">No games found. Playoffs may be off-season.</p>
+            <p className="text-text-tertiary text-sm">No playoff games found. May be off-season for NHL/NBA.</p>
           )}
 
           <div className="space-y-2">
@@ -187,30 +187,47 @@ export function SportsClient({ teams, myGames: initialGames }: { teams: Team[]; 
               const status = event.status?.type?.shortDetail ?? ''
               const state = event.status?.type?.state ?? ''
               const isLive = state === 'in'
+              const isFinal = state === 'post'
+              const competitors = comp?.competitors ?? []
+              const home = competitors.find((c: { homeAway: string }) => c.homeAway === 'home')
+              const away = competitors.find((c: { homeAway: string }) => c.homeAway === 'away')
+              const homeScore = parseInt(home?.score ?? '0')
+              const awayScore = parseInt(away?.score ?? '0')
               const isMyTeam = MY_TEAM_ESPN_IDS.some(id =>
                 event.name?.toLowerCase().includes(id.toLowerCase()) ||
-                comp?.competitors?.some(c => c.team?.displayName?.toLowerCase().includes(id.toLowerCase()))
+                competitors.some((c: { team?: { displayName?: string } }) => c.team?.displayName?.toLowerCase().includes(id.toLowerCase()))
               )
               return (
                 <div key={event.id} className={`rounded-xl border p-4 ${isMyTeam ? 'bg-gold/5 border-gold/30' : 'bg-bg-elevated border-border-subtle'}`}>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-medium tracking-[0.12em] text-text-tertiary uppercase">{event._league}</span>
-                        {isMyTeam && <span className="text-[10px] text-gold">★</span>}
-                        {isLive && <span className="text-[10px] bg-danger/20 text-danger px-1.5 py-0.5 rounded-full">LIVE</span>}
-                      </div>
-                      <p className="text-text-secondary text-sm mt-0.5">{event.name}</p>
-                    </div>
-                    <div className="text-right">
-                      {isLive && comp && (
-                        <p className="text-gold font-bold text-lg tabular-nums">
-                          {comp.competitors.map(c => c.score).join(' – ')}
-                        </p>
-                      )}
-                      <p className="text-text-tertiary text-xs">{status}</p>
-                    </div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[10px] font-medium tracking-[0.12em] text-text-tertiary uppercase">{event._league}</span>
+                    {isMyTeam && <span className="text-[10px] text-gold">★ your team</span>}
+                    {isLive && <span className="text-[10px] bg-danger/20 text-danger px-1.5 py-0.5 rounded-full font-medium">LIVE</span>}
+                    {isFinal && <span className="text-[10px] text-text-tertiary">Final</span>}
+                    {!isLive && !isFinal && <span className="text-[10px] text-text-tertiary">{status}</span>}
                   </div>
+
+                  {(isLive || isFinal) && home && away ? (
+                    <div className="flex items-center gap-3">
+                      <div className={`flex-1 text-sm font-medium ${isFinal && awayScore > homeScore ? 'text-text-tertiary line-through' : 'text-text-primary'}`}>
+                        {away.team?.displayName}
+                      </div>
+                      <div className="text-gold font-bold text-lg tabular-nums">
+                        {awayScore} – {homeScore}
+                      </div>
+                      <div className={`flex-1 text-right text-sm font-medium ${isFinal && homeScore > awayScore ? 'text-text-tertiary line-through' : 'text-text-primary'}`}>
+                        {home.team?.displayName}
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-text-secondary text-sm">{event.name}</p>
+                  )}
+
+                  {isFinal && home && away && (homeScore !== awayScore) && (
+                    <p className="text-[11px] text-success mt-1.5">
+                      {homeScore > awayScore ? (home.team?.displayName ?? 'Home') : (away.team?.displayName ?? 'Away')} wins
+                    </p>
+                  )}
                 </div>
               )
             })}

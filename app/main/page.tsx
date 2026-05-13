@@ -1,6 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/server'
 import { USER_ID } from '@/lib/config'
-import { redirect } from 'next/navigation'
 import { format, subDays } from 'date-fns'
 import { AppShell } from '@/components/nav/AppShell'
 import { DailyHeader } from '@/components/main/DailyHeader'

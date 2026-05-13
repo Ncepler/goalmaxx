@@ -1,6 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/server'
 import { USER_ID } from '@/lib/config'
-import { redirect } from 'next/navigation'
 import { AppShell } from '@/components/nav/AppShell'
 import { CalendarClient } from '@/components/calendar/CalendarClient'
 import { format, startOfMonth, endOfMonth, addMonths } from 'date-fns'
