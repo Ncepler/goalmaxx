@@ -12,6 +12,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      exam_dates: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          type: 'sat' | 'ap' | 'final'
+          date: string
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          type: 'sat' | 'ap' | 'final'
+          date: string
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          type?: 'sat' | 'ap' | 'final'
+          date?: string
+          created_at?: string | null
+        }
+        Relationships: []
+      }
       articles: {
         Row: {
           id: string
