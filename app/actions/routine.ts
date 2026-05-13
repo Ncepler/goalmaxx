@@ -1,14 +1,13 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
+import { USER_ID } from '@/lib/config'
 import { revalidatePath } from 'next/cache'
 import { format } from 'date-fns'
 import { buildSchedule, type RoutineItem } from '@/lib/routine-algorithm'
 
 export async function saveRoutinePlan(formData: FormData) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const supabase = createAdminClient()
 
   const itemsJson = formData.get('items') as string
   const items: RoutineItem[] = JSON.parse(itemsJson)
@@ -20,7 +19,7 @@ export async function saveRoutinePlan(formData: FormData) {
   const { data: existing } = await supabase
     .from('routine_plans')
     .select('id')
-    .eq('user_id', user.id)
+    .eq('user_id', USER_ID)
     .eq('date', date)
     .single()
 
@@ -32,7 +31,7 @@ export async function saveRoutinePlan(formData: FormData) {
     }).eq('id', existing.id)
   } else {
     await supabase.from('routine_plans').insert({
-      user_id: user.id,
+      user_id: USER_ID,
       date,
       bedtime,
       items: items as unknown as import('@/lib/types').Json,
@@ -43,14 +42,12 @@ export async function saveRoutinePlan(formData: FormData) {
 }
 
 export async function importHomeworkAsItems(date: string): Promise<RoutineItem[]> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return []
+  const supabase = createAdminClient()
 
   const { data: assignments } = await supabase
     .from('school_assignments')
     .select('*, school_subjects(name)')
-    .eq('user_id', user.id)
+    .eq('user_id', USER_ID)
     .eq('completed', false)
     .or(`due_date.eq.${date},due_date.is.null`)
 

@@ -1,16 +1,15 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
+import { USER_ID } from '@/lib/config'
 import { revalidatePath } from 'next/cache'
 import { format } from 'date-fns'
 
 export async function addBook(formData: FormData) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const supabase = createAdminClient()
 
   await supabase.from('books').insert({
-    user_id: user.id,
+    user_id: USER_ID,
     title: (formData.get('title') as string).trim(),
     author: (formData.get('author') as string) || null,
     total_pages: Number(formData.get('total_pages') || 0) || null,
@@ -20,9 +19,7 @@ export async function addBook(formData: FormData) {
 }
 
 export async function logReadingSession(formData: FormData) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const supabase = createAdminClient()
 
   const bookId = formData.get('book_id') as string
   const pages = Number(formData.get('pages') || 0)
@@ -30,7 +27,7 @@ export async function logReadingSession(formData: FormData) {
   const currentPage = Number(formData.get('current_page') || 0)
 
   await supabase.from('reading_sessions').insert({
-    user_id: user.id,
+    user_id: USER_ID,
     book_id: bookId,
     date: format(new Date(), 'yyyy-MM-dd'),
     pages,
@@ -43,18 +40,16 @@ export async function logReadingSession(formData: FormData) {
     await supabase.from('books').update({
       current_page: currentPage,
       finished_at: isFinished ? format(new Date(), 'yyyy-MM-dd') : null,
-    }).eq('id', bookId).eq('user_id', user.id)
+    }).eq('id', bookId).eq('user_id', USER_ID)
   }
   revalidatePath('/reading')
 }
 
 export async function addArticle(formData: FormData) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const supabase = createAdminClient()
 
   await supabase.from('articles').insert({
-    user_id: user.id,
+    user_id: USER_ID,
     url: (formData.get('url') as string).trim(),
     title: (formData.get('title') as string) || null,
     source: (formData.get('source') as string) || null,

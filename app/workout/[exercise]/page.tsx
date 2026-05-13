@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
+import { USER_ID } from '@/lib/config'
 import { redirect } from 'next/navigation'
 import { AppShell } from '@/components/nav/AppShell'
 import { SectionHeader } from '@/components/ui/SectionHeader'
@@ -11,15 +12,13 @@ type SetRow = Database['public']['Tables']['sets']['Row'] & { workout_sessions: 
 
 export default async function ExerciseDetailPage({ params }: { params: Promise<{ exercise: string }> }) {
   const { exercise: exerciseId } = await params
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const supabase = createAdminClient()
 
   const [{ data: exercise }, { data: allSets }] = await Promise.all([
-    supabase.from('exercises').select('*').eq('id', exerciseId).eq('user_id', user.id).single(),
+    supabase.from('exercises').select('*').eq('id', exerciseId).eq('user_id', USER_ID).single(),
     supabase.from('sets')
       .select('*, workout_sessions!inner(date, user_id)')
-      .eq('workout_sessions.user_id', user.id)
+      .eq('workout_sessions.user_id', USER_ID)
       .eq('exercise_id', exerciseId)
       .order('logged_at', { ascending: false })
       .limit(200),

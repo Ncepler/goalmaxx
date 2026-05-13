@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
+import { USER_ID } from '@/lib/config'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { format } from 'date-fns'
@@ -19,25 +20,23 @@ const DEFAULT_SUBJECTS = [
 ]
 
 export default async function SchoolPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const supabase = createAdminClient()
 
   let { data: subjects } = await supabase
     .from('school_subjects')
     .select('*')
-    .eq('user_id', user.id)
+    .eq('user_id', USER_ID)
     .eq('active', true)
     .order('sort_order')
 
   if (!subjects || subjects.length === 0) {
     await supabase.from('school_subjects').insert(
-      DEFAULT_SUBJECTS.map(s => ({ ...s, user_id: user.id }))
+      DEFAULT_SUBJECTS.map(s => ({ ...s, user_id: USER_ID }))
     )
     const { data: seeded } = await supabase
       .from('school_subjects')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', USER_ID)
       .eq('active', true)
       .order('sort_order')
     subjects = seeded
@@ -48,7 +47,7 @@ export default async function SchoolPage() {
   const { data: assignments } = await supabase
     .from('school_assignments')
     .select('subject_id, due_date')
-    .eq('user_id', user.id)
+    .eq('user_id', USER_ID)
     .eq('completed', false)
 
   const countBySubject = (assignments ?? []).reduce<Record<string, { count: number; nextDue: string | null }>>(

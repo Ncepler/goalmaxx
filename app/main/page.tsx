@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
+import { USER_ID } from '@/lib/config'
 import { redirect } from 'next/navigation'
 import { format, subDays } from 'date-fns'
 import { AppShell } from '@/components/nav/AppShell'
@@ -14,9 +15,7 @@ import { computeDailyScore } from '@/lib/score'
 export const revalidate = 0
 
 export default async function MainPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const supabase = createAdminClient()
 
   const today = format(new Date(), 'yyyy-MM-dd')
   const tomorrow = format(subDays(new Date(), -1), 'yyyy-MM-dd')
@@ -33,19 +32,19 @@ export default async function MainPage() {
     { data: activeFocusSessions },
     { data: focusSessions },
   ] = await Promise.all([
-    supabase.from('profiles').select('*').eq('id', user.id).single(),
-    supabase.from('tasks').select('*').eq('user_id', user.id).eq('due_date', today).order('created_at'),
-    supabase.from('tasks').select('*').eq('user_id', user.id).eq('due_date', tomorrow).order('created_at'),
-    supabase.from('hydration_logs').select('*').eq('user_id', user.id).eq('date', today),
-    supabase.from('sleep_logs').select('*').eq('user_id', user.id).gte('created_at', sevenDaysAgo + 'T00:00:00').order('created_at', { ascending: false }),
-    supabase.from('workout_sessions').select('id').eq('user_id', user.id).eq('date', today).limit(1),
-    supabase.from('focus_sessions').select('*').eq('user_id', user.id).is('ended_at', null).limit(1),
-    supabase.from('focus_sessions').select('started_at, ended_at').eq('user_id', user.id).eq('broken', false).gte('started_at', today + 'T00:00:00'),
+    supabase.from('profiles').select('*').eq('id', USER_ID).single(),
+    supabase.from('tasks').select('*').eq('user_id', USER_ID).eq('due_date', today).order('created_at'),
+    supabase.from('tasks').select('*').eq('user_id', USER_ID).eq('due_date', tomorrow).order('created_at'),
+    supabase.from('hydration_logs').select('*').eq('user_id', USER_ID).eq('date', today),
+    supabase.from('sleep_logs').select('*').eq('user_id', USER_ID).gte('created_at', sevenDaysAgo + 'T00:00:00').order('created_at', { ascending: false }),
+    supabase.from('workout_sessions').select('id').eq('user_id', USER_ID).eq('date', today).limit(1),
+    supabase.from('focus_sessions').select('*').eq('user_id', USER_ID).is('ended_at', null).limit(1),
+    supabase.from('focus_sessions').select('started_at, ended_at').eq('user_id', USER_ID).eq('broken', false).gte('started_at', today + 'T00:00:00'),
   ])
 
   // If profile doesn't exist yet, create it
   if (!profile) {
-    await supabase.from('profiles').insert({ id: user.id })
+    await supabase.from('profiles').insert({ id: USER_ID })
   }
 
   const p = {

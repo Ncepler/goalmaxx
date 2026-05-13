@@ -1,16 +1,15 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
+import { USER_ID } from '@/lib/config'
 import { revalidatePath } from 'next/cache'
 import { format } from 'date-fns'
 
 export async function logHydration(source: 'cup' | 'bottle' | 'gatorade', ml: number) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const supabase = createAdminClient()
 
   await supabase.from('hydration_logs').insert({
-    user_id: user.id,
+    user_id: USER_ID,
     date: format(new Date(), 'yyyy-MM-dd'),
     source,
     ml,
@@ -20,15 +19,13 @@ export async function logHydration(source: 'cup' | 'bottle' | 'gatorade', ml: nu
 }
 
 export async function removeHydration(source: 'cup' | 'bottle' | 'gatorade', date: string) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const supabase = createAdminClient()
 
   // Delete the most recent log for this source on this date
   const { data: logs } = await supabase
     .from('hydration_logs')
     .select('id')
-    .eq('user_id', user.id)
+    .eq('user_id', USER_ID)
     .eq('date', date)
     .eq('source', source)
     .order('logged_at', { ascending: false })

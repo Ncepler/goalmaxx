@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
+import { USER_ID } from '@/lib/config'
 import { redirect } from 'next/navigation'
 import { AppShell } from '@/components/nav/AppShell'
 import { SectionHeader } from '@/components/ui/SectionHeader'
@@ -8,11 +9,9 @@ import { ShortcutSetup } from '@/components/settings/ShortcutSetup'
 export const revalidate = 0
 
 export default async function SettingsPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const supabase = createAdminClient()
 
-  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+  const { data: profile } = await supabase.from('profiles').select('*').eq('id', USER_ID).single()
   const p = (profile ?? {}) as Record<string, unknown>
 
   return (

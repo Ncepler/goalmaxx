@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
+import { USER_ID } from '@/lib/config'
 import { redirect } from 'next/navigation'
 import { AppShell } from '@/components/nav/AppShell'
 import { CalendarClient } from '@/components/calendar/CalendarClient'
@@ -7,9 +8,7 @@ import { format, startOfMonth, endOfMonth, addMonths } from 'date-fns'
 export const revalidate = 0
 
 export default async function CalendarPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const supabase = createAdminClient()
 
   const monthStart = format(startOfMonth(new Date()), 'yyyy-MM-dd')
   const monthEnd = format(endOfMonth(addMonths(new Date(), 1)), 'yyyy-MM-dd')
@@ -21,15 +20,15 @@ export default async function CalendarPage() {
     { data: subscriptions },
     { data: assignments },
   ] = await Promise.all([
-    supabase.from('tasks').select('id, title, due_date, completed').eq('user_id', user.id)
+    supabase.from('tasks').select('id, title, due_date, completed').eq('user_id', USER_ID)
       .gte('due_date', monthStart).lte('due_date', monthEnd),
-    supabase.from('sat_tests').select('id, scheduled_for, is_practice, total_score').eq('user_id', user.id)
+    supabase.from('sat_tests').select('id, scheduled_for, is_practice, total_score').eq('user_id', USER_ID)
       .gte('scheduled_for', monthStart).lte('scheduled_for', monthEnd),
-    supabase.from('my_games').select('id, sport, scheduled_for, opponent, result').eq('user_id', user.id)
+    supabase.from('my_games').select('id, sport, scheduled_for, opponent, result').eq('user_id', USER_ID)
       .gte('scheduled_for', monthStart).lte('scheduled_for', monthEnd),
-    supabase.from('subscriptions').select('id, service, cost, next_charge_date').eq('user_id', user.id)
+    supabase.from('subscriptions').select('id, service, cost, next_charge_date').eq('user_id', USER_ID)
       .gte('next_charge_date', monthStart).lte('next_charge_date', monthEnd),
-    supabase.from('school_assignments').select('id, title, due_date, subject_id').eq('user_id', user.id)
+    supabase.from('school_assignments').select('id, title, due_date, subject_id').eq('user_id', USER_ID)
       .eq('completed', false).gte('due_date', monthStart).lte('due_date', monthEnd),
   ])
 

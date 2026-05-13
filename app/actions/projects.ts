@@ -1,18 +1,17 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
+import { USER_ID } from '@/lib/config'
 import { revalidatePath } from 'next/cache'
 
 export async function createProject(formData: FormData) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const supabase = createAdminClient()
 
   const name = (formData.get('name') as string).trim()
   const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
 
   await supabase.from('projects').insert({
-    user_id: user.id,
+    user_id: USER_ID,
     slug,
     name,
     tagline: (formData.get('tagline') as string) || null,
@@ -24,21 +23,17 @@ export async function createProject(formData: FormData) {
 }
 
 export async function updateProjectStatus(id: string, status: string) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const supabase = createAdminClient()
 
-  await supabase.from('projects').update({ status }).eq('id', id).eq('user_id', user.id)
+  await supabase.from('projects').update({ status }).eq('id', id).eq('user_id', USER_ID)
   revalidatePath('/projects')
 }
 
 export async function createProjectTask(formData: FormData) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const supabase = createAdminClient()
 
   await supabase.from('project_tasks').insert({
-    user_id: user.id,
+    user_id: USER_ID,
     project_id: formData.get('project_id') as string,
     title: (formData.get('title') as string).trim(),
   })
@@ -46,22 +41,18 @@ export async function createProjectTask(formData: FormData) {
 }
 
 export async function toggleProjectTask(id: string, completed: boolean) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const supabase = createAdminClient()
 
   await supabase.from('project_tasks').update({
     completed,
     completed_at: completed ? new Date().toISOString() : null,
-  }).eq('id', id).eq('user_id', user.id)
+  }).eq('id', id).eq('user_id', USER_ID)
   revalidatePath('/projects')
 }
 
 export async function updateProjectNotes(id: string, notesMd: string) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const supabase = createAdminClient()
 
-  await supabase.from('projects').update({ notes_md: notesMd }).eq('id', id).eq('user_id', user.id)
+  await supabase.from('projects').update({ notes_md: notesMd }).eq('id', id).eq('user_id', USER_ID)
   revalidatePath('/projects')
 }

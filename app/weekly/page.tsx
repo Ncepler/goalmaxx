@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
+import { USER_ID } from '@/lib/config'
 import { redirect } from 'next/navigation'
 import { AppShell } from '@/components/nav/AppShell'
 import { WeeklyClient } from '@/components/weekly/WeeklyClient'
@@ -7,9 +8,7 @@ import { format, startOfWeek, subWeeks } from 'date-fns'
 export const revalidate = 0
 
 export default async function WeeklyPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const supabase = createAdminClient()
 
   const thisWeekStart = format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd')
   const today = format(new Date(), 'yyyy-MM-dd')
@@ -22,11 +21,11 @@ export default async function WeeklyPage() {
     { data: hydrationLogs },
     { data: sleepLogs },
   ] = await Promise.all([
-    supabase.from('weekly_reviews').select('*').eq('user_id', user.id).order('week_start', { ascending: false }).limit(10),
-    supabase.from('tasks').select('completed, due_date').eq('user_id', user.id).gte('due_date', sevenDaysAgo).lte('due_date', today),
-    supabase.from('workout_sessions').select('id, date').eq('user_id', user.id).gte('date', sevenDaysAgo),
-    supabase.from('hydration_logs').select('ml, date').eq('user_id', user.id).gte('date', sevenDaysAgo),
-    supabase.from('sleep_logs').select('duration_minutes, created_at').eq('user_id', user.id).gte('created_at', sevenDaysAgo + 'T00:00:00'),
+    supabase.from('weekly_reviews').select('*').eq('user_id', USER_ID).order('week_start', { ascending: false }).limit(10),
+    supabase.from('tasks').select('completed, due_date').eq('user_id', USER_ID).gte('due_date', sevenDaysAgo).lte('due_date', today),
+    supabase.from('workout_sessions').select('id, date').eq('user_id', USER_ID).gte('date', sevenDaysAgo),
+    supabase.from('hydration_logs').select('ml, date').eq('user_id', USER_ID).gte('date', sevenDaysAgo),
+    supabase.from('sleep_logs').select('duration_minutes, created_at').eq('user_id', USER_ID).gte('created_at', sevenDaysAgo + 'T00:00:00'),
   ])
 
   const tasksCompleted = (tasks ?? []).filter(t => t.completed).length

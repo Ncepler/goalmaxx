@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
+import { USER_ID } from '@/lib/config'
 import { redirect } from 'next/navigation'
 import { AppShell } from '@/components/nav/AppShell'
 import { ProjectsClient } from '@/components/projects/ProjectsClient'
@@ -14,28 +15,26 @@ const SEED_PROJECTS = [
 ]
 
 export default async function ProjectsPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const supabase = createAdminClient()
 
   let { data: projects } = await supabase
     .from('projects')
     .select('*')
-    .eq('user_id', user.id)
+    .eq('user_id', USER_ID)
     .order('created_at')
 
   if (!projects || projects.length === 0) {
     await supabase.from('projects').insert(
-      SEED_PROJECTS.map(p => ({ ...p, user_id: user.id }))
+      SEED_PROJECTS.map(p => ({ ...p, user_id: USER_ID }))
     )
-    const { data: seeded } = await supabase.from('projects').select('*').eq('user_id', user.id).order('created_at')
+    const { data: seeded } = await supabase.from('projects').select('*').eq('user_id', USER_ID).order('created_at')
     projects = seeded
   }
 
   const { data: tasks } = await supabase
     .from('project_tasks')
     .select('project_id, completed')
-    .eq('user_id', user.id)
+    .eq('user_id', USER_ID)
 
   const openTasksByProject = (tasks ?? []).reduce<Record<string, number>>((acc, t) => {
     if (!t.completed) acc[t.project_id] = (acc[t.project_id] ?? 0) + 1

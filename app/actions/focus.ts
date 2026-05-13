@@ -1,15 +1,14 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
+import { USER_ID } from '@/lib/config'
 import { revalidatePath } from 'next/cache'
 
 export async function startFocus(unlockConditions?: string) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const supabase = createAdminClient()
 
   await supabase.from('focus_sessions').insert({
-    user_id: user.id,
+    user_id: USER_ID,
     started_at: new Date().toISOString(),
     unlock_conditions: unlockConditions ? { text: unlockConditions } : null,
   })
@@ -18,9 +17,7 @@ export async function startFocus(unlockConditions?: string) {
 }
 
 export async function endFocus(sessionId: string, broken = false) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const supabase = createAdminClient()
 
   await supabase
     .from('focus_sessions')
@@ -29,7 +26,7 @@ export async function endFocus(sessionId: string, broken = false) {
       broken,
     })
     .eq('id', sessionId)
-    .eq('user_id', user.id)
+    .eq('user_id', USER_ID)
 
   revalidatePath('/main')
 }

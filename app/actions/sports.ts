@@ -1,15 +1,14 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
+import { USER_ID } from '@/lib/config'
 import { revalidatePath } from 'next/cache'
 
 export async function addMyGame(formData: FormData) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const supabase = createAdminClient()
 
   await supabase.from('my_games').insert({
-    user_id: user.id,
+    user_id: USER_ID,
     sport: formData.get('sport') as string,
     scheduled_for: formData.get('scheduled_for') as string,
     location: (formData.get('location') as string) || null,
@@ -20,10 +19,8 @@ export async function addMyGame(formData: FormData) {
 }
 
 export async function updateGameResult(id: string, result: string, notes?: string) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const supabase = createAdminClient()
 
-  await supabase.from('my_games').update({ result, notes: notes ?? null }).eq('id', id).eq('user_id', user.id)
+  await supabase.from('my_games').update({ result, notes: notes ?? null }).eq('id', id).eq('user_id', USER_ID)
   revalidatePath('/sports/my-games')
 }

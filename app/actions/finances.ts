@@ -1,15 +1,14 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
+import { USER_ID } from '@/lib/config'
 import { revalidatePath } from 'next/cache'
 
 export async function createSubscription(formData: FormData) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const supabase = createAdminClient()
 
   await supabase.from('subscriptions').insert({
-    user_id: user.id,
+    user_id: USER_ID,
     service: (formData.get('service') as string).trim(),
     cost: Number(formData.get('cost')),
     currency: (formData.get('currency') as string) || 'USD',
@@ -20,21 +19,17 @@ export async function createSubscription(formData: FormData) {
 }
 
 export async function deleteSubscription(id: string) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const supabase = createAdminClient()
 
-  await supabase.from('subscriptions').delete().eq('id', id).eq('user_id', user.id)
+  await supabase.from('subscriptions').delete().eq('id', id).eq('user_id', USER_ID)
   revalidatePath('/finances')
 }
 
 export async function createOrder(formData: FormData) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const supabase = createAdminClient()
 
   await supabase.from('incoming_orders').insert({
-    user_id: user.id,
+    user_id: USER_ID,
     source: (formData.get('source') as string).trim(),
     amount: Number(formData.get('amount')),
     currency: (formData.get('currency') as string) || 'USD',
@@ -46,13 +41,11 @@ export async function createOrder(formData: FormData) {
 }
 
 export async function updateOrderStatus(id: string, status: 'pending' | 'received' | 'overdue') {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const supabase = createAdminClient()
 
   await supabase.from('incoming_orders').update({
     status,
     received_at: status === 'received' ? new Date().toISOString() : null,
-  }).eq('id', id).eq('user_id', user.id)
+  }).eq('id', id).eq('user_id', USER_ID)
   revalidatePath('/finances')
 }

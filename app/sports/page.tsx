@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
+import { USER_ID } from '@/lib/config'
 import { redirect } from 'next/navigation'
 import { AppShell } from '@/components/nav/AppShell'
 import { SportsClient } from '@/components/sports/SportsClient'
@@ -13,14 +14,12 @@ const TEAMS = [
 ]
 
 export default async function SportsPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const supabase = createAdminClient()
 
   const { data: myGames } = await supabase
     .from('my_games')
     .select('*')
-    .eq('user_id', user.id)
+    .eq('user_id', USER_ID)
     .order('scheduled_for', { ascending: false })
 
   return (

@@ -1,10 +1,9 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
+import { USER_ID } from '@/lib/config'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const supabase = createAdminClient()
 
   const { message, context } = await request.json()
 
@@ -12,7 +11,7 @@ export async function POST(request: Request) {
   const { data: profile } = await supabase
     .from('profiles')
     .select('anthropic_api_key')
-    .eq('id', user.id)
+    .eq('id', USER_ID)
     .single()
 
   const PLACEHOLDER = 'Overseer is sleeping. Wake him up by enabling the Anthropic API in Settings.'
@@ -31,7 +30,7 @@ export async function POST(request: Request) {
   const responseText = hasApiKey ? PLACEHOLDER : PLACEHOLDER  // swap TODO(api) above
 
   await supabase.from('overseer_messages').insert({
-    user_id: user.id,
+    user_id: USER_ID,
     message,
     context_snapshot: context,
     response: responseText,
